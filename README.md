@@ -1,0 +1,11 @@
+# Pubs_Urap
+
+Currently the program scrapes 'elite' level proxies from sslproxies.org and filters them out based on connectivity (done via proxies.py), then saved as a csv file of proxies that will connect and work for the scraping. A random proxy and user agent is selected as a core component of the selenium chrome webdriver. A lot of other options, like enabling scraping were also added in terms of preferences.
+
+One issue that comes up often is the presence of recaptcha. Currently, I had set it up so that the recaptcha must be solved manually. The cookies from the recaptcha-solved proxy and user agent are stored as a .pkg file, which can then be unpacked for later use. Usually one recaptcha solution will allow the scraper to make 200-400 queries to GS without another recaptcha popping up.
+
+In terms of the recaptcha test: I tried to find if there was open-source python libraries that had already solved the image problems. While I did find some community based ones, I did not implement/test them out. The solving may be able to be completed via machine learning and CV: the prompts repeat quite often asking for image identification of buses, traffic lights, crosswalks, bikes, cars, and (more rarely) stairs and chimneys. I suspect that the more 'suspicious' the requests are, the harder the tests become, often having to wait long times for tiles to load or images with blur and added noise. 
+
+Another point I ran across was while I am able to make queries quite easily to the GS search bar after the recaptcha, the variability of finding the abstract in the hyperlinked results needs some work around. Additionally, sites like JSTOR also require another recaptcha to ensure that it is not a crawler.
+
+In terms of next steps, I would recommend creating a CV/ML trained on noisy and non noisy google images of recaptcha objects and test out solutions for this. Checks for 'first result' also need to be implemented. Additionally, building on the scraping of abstracts and overall speed of the program could be improved. Article queries that have an [html] tag in front of the results usually provide smoothest scraping, while any [pdf] or [citation] tag may have no abstract or not have a link but a download instead.
