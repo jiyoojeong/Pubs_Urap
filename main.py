@@ -133,7 +133,7 @@ def search(driver, query, p_idx, proxies, bar=None, button=None, year=''):
 
     timeout = 60
 
-    print('loading...')
+    # print('loading...')
     try:
         reload_present = EC.presence_of_element_located((By.XPATH, '//*[@id="reload-button"]'))
         element_present = EC.presence_of_element_located((By.XPATH, '//*[@id="gs_hdr_lgo"]'))
@@ -141,12 +141,12 @@ def search(driver, query, p_idx, proxies, bar=None, button=None, year=''):
         try:
             WebDriverWait(driver, 10).until(element_present)
         except:
-            print('reloading...')
+            # print('reloading...')
             WebDriverWait(driver, 5).until(reload_present)
             driver.find_element_by_xpath('//*[@id="reload-button"]').click()
             WebDriverWait(driver, timeout).until(element_present)
 
-        print("Page loaded.")
+        # print("Page loaded.")
 
     except TimeoutException:
         print("Timed out waiting for page to load.")
@@ -158,19 +158,19 @@ def search(driver, query, p_idx, proxies, bar=None, button=None, year=''):
         # clear old file
         os.remove('data/proxies.csv')
 
-        print("file rewrite.")
+        # print("file rewrite.")
         proxies.to_csv('data/proxies.csv', index=False)
-        print("file rewrite complete")
+        # print("file rewrite complete")
         # if proxies df has less than 10, run proxies.py again!
         if proxies.shape[0] <= 5:
-            print("proxies running out, running proxies scraper again.")
+            print("proxies running out, run proxies scraper again.")
             # proxies()
             proxies_old = pd.read_csv('data/proxies.csv', header=0)
             proxies_new = pd.read_csv('data/proxies_new.csv', header=0)
             proxies = pd.concat([proxies_old, proxies_new]).drop_duplicates().reset_index(drop=True)
 
         driver.quit()
-        print('quit driver')
+        # ('quit driver')
         exit()
 
     time.sleep(np.random.uniform(1, 2))
@@ -204,7 +204,7 @@ def search(driver, query, p_idx, proxies, bar=None, button=None, year=''):
                 proxies.to_csv('data/proxies.csv', index=False)
                 # if proxies df has less than 10, run proxies.py again!
                 if proxies.shape[0] <= 10:
-                    print("proxies running out, running proxies scraper again.")
+                    print("proxies running out, run proxies scraper again.")
                     # proxies()
                     proxies_old = pd.read_csv('data/proxies.csv', header=0)
                     proxies_new = pd.read_csv('data/proxies_new.csv', header=0)
@@ -213,28 +213,7 @@ def search(driver, query, p_idx, proxies, bar=None, button=None, year=''):
                 driver.quit()
                 exit()
 
-            '''try:
-                need_upgrade = EC.presence_of_element_located((By.XPATH, '/html/body/div/div[3]/p[1]'))
-                upgrade = driver.find_element_by_xpath('/html/body/div/div[3]/p[1]')
-                if 'upgrade' in upgrade.text:
-                    print(upgrade.text)
-                    # mark proxy as invalid
-                    # delete proxy
-                    #proxies.drop(axis=0, index=p_idx, inplace=True)
-                    # maybe delete proxy cookies?
-                    # rewrite data/proxies.csv
-                    # clear old file
-                    # os.remove('data/proxies.csv')
-
-                    #proxies.to_csv('data/proxies.csv', index=False)
-                    # if proxies df has less than 10, run proxies.py again!
-                    #if proxies.shape[0] <= 10:
-                    #    proxies()
-                    #driver.quit()
-                    #exit()
-                    print("proxy/user agent does not support upgrade.")'''
-            #except Exception:
-            print("no errors with recaptcha... proceeding.")
+            # print("no errors with recaptcha... proceeding.")
             time.sleep(np.random.uniform(1,2))
             WebDriverWait(driver, timeout=1000).until(
                 EC.visibility_of_any_elements_located((By.XPATH, '//*[@id="gs_res_ccl_mid"]/div')))
@@ -261,7 +240,7 @@ def search(driver, query, p_idx, proxies, bar=None, button=None, year=''):
 
     except Exception as e:
         if not captcha_done:
-            print("probs recaptcha not loading. remove proxy.")
+            print("Recaptcha not loading. remove proxy.")
             proxies.drop(index=p_idx, inplace=True)
             # maybe delete proxy cookies?
             # rewrite data/proxies.csv
@@ -287,15 +266,15 @@ def search(driver, query, p_idx, proxies, bar=None, button=None, year=''):
 
 
 def find_abstracts(res, proxies):
-    # TODO:yes
-    print('finding abstracts.')
+    # print('finding abstracts.')
 
     def find_abstract(article, proxies):
         # click link
         try:
-            link = article.find_element_by_xpath('(//*[@id="gs_res_ccl_mid"]/div/div[2]/h3/a |'
-                                                 ' //*[@id="gs_res_ccl_mid"]/div/div[2]/h3/*/a )').get_attribute('href')
+            link = article.find_element_by_xpath('(//*[@id="gs_res_ccl_mid"]/div[1]/div[2]/h3/a)').get_attribute('href')
+            #'//*[@id="gs_res_ccl_mid"]/div[1]/div[2]/h3'
             print("link:", link)
+
             driver.get(link)
             time.sleep(np.random.uniform(1, 2))
             driver.refresh()
@@ -317,7 +296,9 @@ def find_abstracts(res, proxies):
                 proxies.to_csv('data/proxies.csv', index=False)
 
             except:
-                print("page is prob loading?")
+                # do nothing.
+                nothing = 1
+                # print("page is prob loading?")
 
             try:
                 time.sleep(np.random.uniform(5, 10))
@@ -340,18 +321,18 @@ def find_abstracts(res, proxies):
                                                         + "//*[contains(., 'description')] |"
                                                         + "//*[contains(., 'Description')] |"
                                                         + "//*[contains(., 'DESCRIPTION')] )")
-                    print("abs found:")
+                    # print("abs found:")
                     if not abs:
                         print(abs)
                         return abs
                     else:
-                        return 'NA'
+                        return link
                     # driver.execute_script("window.history.go(-1)")
 
             except:
-                print('abs not found?')
+                # print('abs not found?')
                 driver.execute_script("window.history.go(-1)")
-                return 'NA'
+                return link
             # get paragraph if it exists
             # else return 'NA'
         except:
@@ -360,18 +341,18 @@ def find_abstracts(res, proxies):
 
     abstract = ''
     if len(res) == 1:
-        print('len 1')
+        # print('len 1')
         # one query result.
         # make sure the result matches the year and publication
         # click and find abstract.
         abstract = find_abstract(res[0], proxies)
     elif len(res) == 0:
-        print('len 0')
+        # print('len 0')
         # no results found.
         # fill csv with NA
         abstract = 'NA'
     else:
-        print('len +')
+        # print('len +')
         # multiple results: try to find right one by matching year and publication.
         abstract = find_abstract(res[0], proxies)
 
@@ -395,17 +376,18 @@ for i, row in pubs_clean.loc[:, ['Title', 'articleID']].iterrows():
 
     # search_bar, search_button = find_searchfuncs(driver)
     try:
-        abstract = search(driver, query, proxy_idx, proxies)
+        abstract_link = search(driver, query, proxy_idx, proxies)
     except:
-        abstract = 'NA'
-    abstracts.append([abstract, articleID])
+        abstract_link = 'NA'
+        quit()
+    abstracts.append({'abstract link':abstract_link, 'articleID': articleID})
     # parse_results()
     i += 1
 
 print(abstracts)
 try:
     with open('data/abstracts_test.csv', 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=['abstract'])
+        writer = csv.DictWriter(csvfile, fieldnames=['abstract link', 'articleID'])
         writer.writeheader()
         for data in abstracts:
             writer.writerow(data)
@@ -418,8 +400,4 @@ driver.quit()
 
 # start 3-4 ish?
 # end 5:30
-# total queries per proxy = 406
-
-
-# start 10 PM
-# end ??
+# total queries per verified proxy = 200-406
